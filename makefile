@@ -15,5 +15,5 @@ help: ## This help.
 build: ## copy files to anki add on folder
 	# launching docker containers
 	mkdir -p ${ADDON_PATH}/${PROJECT_NAME}
-	cp -rf ./src/. ${ADDON_PATH}/${PROJECT_NAME}/.
+	#cp -rf ./src/. ${ADDON_PATH}/${PROJECT_NAME}/.
 	cp ./src/notebook_cloze.py ${ADDON_PATH}
