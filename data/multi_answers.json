@@ -1,0 +1,29 @@
+{
+    "answers":[
+        [
+            "             # training\n",
+            "            model.train()\n",
+            "            trn_losses,_,_,_ = zip(\n",
+            "                *[self.descend_(xb, yb) for xb, yb in self.data['trn'] ]\n",
+            "            )\n"
+        ],
+        [
+            "            training_loss = sumLoss(trn_losses)\n",
+            "            validation_loss = sumLoss(val_losses)\n"
+        ],
+        [
+            "    def __init__(self, layers):\n",
+            "        super().__init__()\n",
+            "        print(layers)\n",
+            "        self.layers = {}\n",
+            "        for i in range(len(layers) -1):\n",
+            "            print(i, [layers[i], layers[i+1]])\n",
+            "            self.layers[f\"lin_{i}\"] = nn.Linear(layers[i], layers[i+1])\n",
+            "    def forward(self, xb):\n",
+            "        ab = xb\n",
+            "        for i in range(len(layers) -1):\n",
+            "            ab = F.relu(self.layers[f\"lin_{i}\"](ab))\n",
+            "        return ab\n"
+        ]
+    ]
+}
