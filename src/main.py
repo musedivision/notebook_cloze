@@ -10,6 +10,7 @@ from aqt.qt import *
 
 from PyQt4.QtGui import QWidget, QFileDialog, QDialog
 from dialog import Dialog 
+from process_notebook import readNotebook
 
 def testFunction():
     # get the number of cards in the current collection, which is stored in
@@ -34,12 +35,25 @@ def launchEditor():
 class NotebookEdit(Dialog):
     def __init__(self):
         super(NotebookEdit, self).__init__()
-        # QDialog.__init__(self)
-        # filename = getFilename()
-        # showInfo(filename)
-        # Dialog = QDialog()
-        # self.ui = ClozeCreater()
-        # self.ui.setupUi(self)
+        
+        self.notebookFile.clicked.connect(self.getFilename)
+
+    def getFilename(self):
+        w = QWidget() 
+        
+        filename = QFileDialog.getOpenFileName(w, 'Open File') 
+        w.show()
+        self.filename = filename
+
+        self.processNotebook()
+
+    def processNotebook(self):
+       output = readNotebook(self.filename) 
+       showInfo('\n'.join(output[0][0]) )
+
+
+    def accept(self):
+        showInfo('accep clicked')
 
 class NotebookCloze(object):
     def __init__(self, ed):

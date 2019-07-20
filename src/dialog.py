@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'dialog.ui'
+# Form implementation generated from reading ui file 'src/dialog.ui'
 #
 # Created by: PyQt4 UI code generator 4.12.1
 #
@@ -34,12 +34,15 @@ class Ui_Dialog(object):
         self.textEdit = QtGui.QTextEdit(Dialog)
         self.textEdit.setGeometry(QtCore.QRect(40, 50, 321, 79))
         self.textEdit.setObjectName(_fromUtf8("textEdit"))
-        self.listView = QtGui.QListView(Dialog)
-        self.listView.setGeometry(QtCore.QRect(120, 130, 161, 91))
-        self.listView.setObjectName(_fromUtf8("listView"))
+        self.answerList = QtGui.QListView(Dialog)
+        self.answerList.setGeometry(QtCore.QRect(40, 190, 321, 41))
+        self.answerList.setObjectName(_fromUtf8("answerList"))
         self.label = QtGui.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(40, 30, 281, 20))
         self.label.setObjectName(_fromUtf8("label"))
+        self.notebookFile = QtGui.QPushButton(Dialog)
+        self.notebookFile.setGeometry(QtCore.QRect(100, 150, 181, 32))
+        self.notebookFile.setObjectName(_fromUtf8("notebookFile"))
 
         self.retranslateUi(Dialog)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
@@ -49,6 +52,7 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(_translate("Dialog", "Dialog", None))
         self.label.setText(_translate("Dialog", "instructions", None))
+        self.notebookFile.setText(_translate("Dialog", "choose notebook", None))
 
 
 class Dialog(QtGui.QDialog, Ui_Dialog):
