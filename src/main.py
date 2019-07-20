@@ -8,7 +8,8 @@ from anki.hooks import addHook
 
 from aqt.qt import *
 
-from PyQt4.QtGui import QWidget, QFileDialog
+from PyQt4.QtGui import QWidget, QFileDialog, QDialog
+from dialog import Dialog 
 
 def testFunction():
     # get the number of cards in the current collection, which is stored in
@@ -19,31 +20,34 @@ def testFunction():
     # showInfo("testing 123 " % cardCount)
 
 def getFilename():
-    w = QWidget()
+    w = QWidget() 
     w.resize(320, 240)
     w.setWindowTitle("Hello World!")
     
-    filename = QFileDialog.getOpenFileName(w, 'Open File', '/') 
+    filename = QFileDialog.getOpenFileName(w, 'Open File', '~/code') 
     w.show()
     return filename
 
-class NotebookEdit(object):
-    def __init__(self, mw):
-        showInfo("start gui")
-        # QDialog.__init__(self, parent=None)
-        filename = getFilename()
-        showInfo(filename)
+def launchEditor():
+    NotebookEdit()
 
-        w = QWidget()
-        w.resize(320, 240)
-        w.setWindowTitle("Hello World!")
-        
-        w.show()
+class NotebookEdit(Dialog):
+    def __init__(self):
+        super(NotebookEdit, self).__init__()
+        # QDialog.__init__(self)
+        # filename = getFilename()
+        # showInfo(filename)
+        # Dialog = QDialog()
+        # self.ui = ClozeCreater()
+        # self.ui.setupUi(self)
 
 class NotebookCloze(object):
     def __init__(self, ed):
         # showInfo("yo what up")
-        mw.ncEditor = NotebookEdit(mw)
+        mw.ncEditor = NotebookEdit()
+        mw.ncEditor.show()
+
+
 
 def onNCButton(ed):
     # showInfo('this should open the editor window')
@@ -51,17 +55,22 @@ def onNCButton(ed):
 
 def onSetupEditorButtons(self):
     # showInfo('running notebook cloze')
-    self._addButton("new notebook",
+    btn = self._addButton("new notebook",
             lambda o=self: onNCButton(self),
             _("Alt-c"), _("Make new Notebook Cloze"),            canDisable=False)
 
+    press_action = QAction(self.parentWindow, triggered=btn.animateClick)
+    press_action.setShortcut(QKeySequence(_("Alt-n")))
+    btn.addAction(press_action)
+
 addHook('setupEditorButtons', onSetupEditorButtons)
 
+#showInfo("addon properly loaded")
 
 # create a new menu item, "test"
-action = QAction("test", mw)
+action = QAction("launch notebook cloze", mw)
 
 # set it to call testFunction when it's clicked
-action.triggered.connect(testFunction)
+action.triggered.connect(launchEditor)
 # and add it to the tools menu
 mw.form.menuTools.addAction(action)
