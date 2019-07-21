@@ -5,10 +5,10 @@ from aqt.utils import showInfo
 # import all of the Qt GUI library
 from aqt.qt import *
 from anki.hooks import addHook
-
+import logging, sys
 from aqt.qt import *
 
-from PyQt4.QtGui import QWidget, QFileDialog, QDialog
+from PyQt4.QtGui import QWidget, QFileDialog, QDialog, QListWidgetItem, QStandardItemModel, QStandardItem
 from dialog import Dialog 
 from process_notebook import readNotebook
 
@@ -20,15 +20,6 @@ def testFunction():
     showInfo("yo what up")
     # showInfo("testing 123 " % cardCount)
 
-def getFilename():
-    w = QWidget() 
-    w.resize(320, 240)
-    w.setWindowTitle("Hello World!")
-    
-    filename = QFileDialog.getOpenFileName(w, 'Open File', '~/code') 
-    w.show()
-    return filename
-
 def launchEditor():
     NotebookEdit()
 
@@ -39,21 +30,26 @@ class NotebookEdit(Dialog):
         self.notebookFile.clicked.connect(self.getFilename)
 
     def getFilename(self):
-        w = QWidget() 
-        
-        filename = QFileDialog.getOpenFileName(w, 'Open File') 
-        w.show()
-        self.filename = filename
+        # w = QWidget() 
+        # filename = QFileDialog.getOpenFileName(w, 'Open File') 
+        # w.show()
+        # self.filename = filename
 
+        self.filename = '/Users/patricio/code/notebook_cloze/data/multi_cloze.ipynb'
         self.processNotebook()
 
     def processNotebook(self):
        output = readNotebook(self.filename) 
-       showInfo('\n'.join(output[0][0]) )
+       answers,_ = zip(*output)
+
+       answers = ['\n'.join(t) for t in answers ] 
+       # cloze_txt = '\n'.join(output[0][0]) 
+       self.answerList.addItems(answers)
 
 
     def accept(self):
-        showInfo('accep clicked')
+        instructions = self.instructionText.toPlainText()
+        showInfo(instructions)
 
 class NotebookCloze(object):
     def __init__(self, ed):
