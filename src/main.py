@@ -1,5 +1,5 @@
 # import the main window object (mw) from aqt
-from aqt import mw
+from aqt import mw, deckchooser
 # import the "show info" tool from utils.py
 from aqt.utils import showInfo
 # import all of the Qt GUI library
@@ -32,6 +32,12 @@ class NotebookEdit(Dialog):
         self.notebookFile.clicked.connect(self.getFilename)
         self.model = template.add_nbc_model(mw.col)
 
+        self.deck_container = QWidget()
+        self.deckChooser = deckchooser.DeckChooser(mw, self.deck_container, label=True)
+        self.deckChooser.deck.setAutoDefault(False)
+        self.did = self.deckChooser.selectedId()
+
+
     def getFilename(self):
         # w = QWidget() 
         # filename = QFileDialog.getOpenFileName(w, 'Open File') 
@@ -44,7 +50,6 @@ class NotebookEdit(Dialog):
     def processNotebook(self):
        output = readNotebook(self.filename) 
        answers,nbs = zip(*output)
-
        
        self.processed = { 'answers': answers, 'nbs':nbs, 'output':output } 
 
@@ -57,7 +62,7 @@ class NotebookEdit(Dialog):
 
         # add data for all fields 
         # add tags to note
-        note = Note(mw.col, model)
+        note = Note(mw.col, self.model)
 
 
         # finally add to collection
@@ -66,8 +71,7 @@ class NotebookEdit(Dialog):
 
     def accept(self):
         instructions = self.instructionText.toPlainText()
-        model = mw.col.models.byName('Basic')
-        showInfo(model)
+        showInfo(str(self.did))
         
 
 class NotebookCloze(object):
