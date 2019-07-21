@@ -30,7 +30,7 @@ class NotebookEdit(Dialog):
         super(NotebookEdit, self).__init__()
         
         self.notebookFile.clicked.connect(self.getFilename)
-        self.model = template.add_nbc_model(mw.col)
+        self.model = template.get_nbc_model(mw.col)
 
         self.deck_container = QWidget()
         self.deckChooser = deckchooser.DeckChooser(mw, self.deck_container, label=True)
@@ -59,7 +59,7 @@ class NotebookEdit(Dialog):
     
     def addNote(self):
         # need deck id
-
+        self.model['did'] = self.did
         # add data for all fields 
         # add tags to note
         note = Note(mw.col, self.model)

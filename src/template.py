@@ -1,6 +1,7 @@
 # card template
 
-NBC_CARD_NAME = "Notebook Cloze"
+NBC_MODEL_NAME = "Notebook Cloze"
+NBC_CARD_NAME = "NBC card"
 
 NBC_FLDS = {
     'is': u"Instructions",
@@ -28,9 +29,15 @@ nbc_card_css = """\
 }
 """
 
+def get_nbc_model(col):
+    model = col.models.byName(NBC_MODEL_NAME)
+    if not model:
+        model = add_nbc_model(col)
+    return model
+
 def add_nbc_model(col):
     models = col.models
-    nbc_model = models.new(NBC_CARD_NAME)
+    nbc_model = models.new(NBC_MODEL_NAME)
     
     for i in NBC_FLD_IDS:
         fld = models.newField(NBC_FLDS[i])
