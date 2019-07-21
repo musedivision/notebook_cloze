@@ -12,7 +12,7 @@ from aqt.qt import *
 from PyQt4.QtGui import QWidget, QFileDialog, QDialog, QListWidgetItem, QStandardItemModel, QStandardItem
 from dialog import Dialog 
 from process_notebook import readNotebook
-import template
+from template import *
 
 def testFunction():
     # get the number of cards in the current collection, which is stored in
@@ -30,12 +30,14 @@ class NotebookEdit(Dialog):
         super(NotebookEdit, self).__init__()
         
         self.notebookFile.clicked.connect(self.getFilename)
-        self.model = template.get_nbc_model(mw.col)
+        self.model = get_nbc_model(mw.col)
 
         self.deck_container = QWidget()
         self.deckChooser = deckchooser.DeckChooser(mw, self.deck_container, label=True)
         self.deckChooser.deck.setAutoDefault(False)
         self.did = self.deckChooser.selectedId()
+
+        # showInfo(str(self.model['flds']))
 
 
     def getFilename(self):
@@ -56,23 +58,42 @@ class NotebookEdit(Dialog):
        answers = ['\n'.join(t) for t in answers ] 
        # cloze_txt = '\n'.join(output[0][0]) 
        self.answerList.addItems(answers)
+       
+       ans = answers[0]
+       instr = self.instructionText.toPlainText()
+       nb_link = 'http://google.com'
+       # construct fields dict
+       fields = {
+                NBC_FLDS['is']: instr,
+                NBC_FLDS['lk']: nb_link,
+                NBC_FLDS['an']: ans
+                }
+       self.newCardFields = fields
     
-    def addNote(self):
+    def addNote(self, fields):
+        flds = self.model['flds']
         # need deck id
         self.model['did'] = self.did
-        # add data for all fields 
+
         # add tags to note
+
         note = Note(mw.col, self.model)
 
+        # add data for all fields 
 
+        for i in flds:
+            fname = i["name"]
+            if fname in fields:
+                note[fname] = fields[fname]
         # finally add to collection
         mw.col.addNote(note)
         
 
     def accept(self):
         instructions = self.instructionText.toPlainText()
-        showInfo(str(self.did))
-        
+        self.addNote(self.newCardFields)
+        showInfo('Added 1 card')
+        self.close()
 
 class NotebookCloze(object):
     def __init__(self, ed):
