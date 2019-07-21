@@ -17,6 +17,10 @@ build: ## copy files to anki add on folder
 	mkdir -p ${ADDON_PATH}/${PROJECT_NAME}
 	cp -rf ./src/. ${ADDON_PATH}/${PROJECT_NAME}/.
 	cp ./notebook_cloze.py ${ADDON_PATH}/${MENU_NAME}.py
+	#${MAKE} start
 
 ui: ## build ui files
 	pyuic4 -w src/dialog.ui > src/dialog.py
+
+start: ## start anki app
+	open -a Anki

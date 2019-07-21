@@ -5,12 +5,14 @@ from aqt.utils import showInfo
 # import all of the Qt GUI library
 from aqt.qt import *
 from anki.hooks import addHook
+from anki.notes import Note
 import logging, sys
 from aqt.qt import *
 
 from PyQt4.QtGui import QWidget, QFileDialog, QDialog, QListWidgetItem, QStandardItemModel, QStandardItem
 from dialog import Dialog 
 from process_notebook import readNotebook
+import template
 
 def testFunction():
     # get the number of cards in the current collection, which is stored in
@@ -28,6 +30,7 @@ class NotebookEdit(Dialog):
         super(NotebookEdit, self).__init__()
         
         self.notebookFile.clicked.connect(self.getFilename)
+        self.model = template.add_nbc_model(mw.col)
 
     def getFilename(self):
         # w = QWidget() 
@@ -40,16 +43,32 @@ class NotebookEdit(Dialog):
 
     def processNotebook(self):
        output = readNotebook(self.filename) 
-       answers,_ = zip(*output)
+       answers,nbs = zip(*output)
+
+       
+       self.processed = { 'answers': answers, 'nbs':nbs, 'output':output } 
 
        answers = ['\n'.join(t) for t in answers ] 
        # cloze_txt = '\n'.join(output[0][0]) 
        self.answerList.addItems(answers)
+    
+    def addNote(self):
+        # need deck id
 
+        # add data for all fields 
+        # add tags to note
+        note = Note(mw.col, model)
+
+
+        # finally add to collection
+        mw.col.addNote(note)
+        
 
     def accept(self):
         instructions = self.instructionText.toPlainText()
-        showInfo(instructions)
+        model = mw.col.models.byName('Basic')
+        showInfo(model)
+        
 
 class NotebookCloze(object):
     def __init__(self, ed):
