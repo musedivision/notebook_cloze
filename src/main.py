@@ -13,6 +13,23 @@ from PyQt4.QtGui import QWidget, QFileDialog, QDialog, QListWidgetItem, QStandar
 from dialog import Dialog 
 from process_notebook import readNotebook
 from template import *
+import os
+import json
+import string
+import random
+import unicodedata
+from stat import S_IREAD, S_IRGRP, S_IROTH
+
+randomString = lambda n: ''.join([random.choice(string.ascii_lowercase) for _ in range(n)])
+temporary_notebook_dir = '/tmp/anki_notebooks/'
+if not os.path.exists(temporary_notebook_dir):
+    os.makedirs(temporary_notebook_dir)
+
+
+
+def nbfile2url(nbpath):
+    showInfo(nbpath)
+    return 'http://alfred.local:8889/notebooks/anki/' + nbpath
 
 def testFunction():
     # get the number of cards in the current collection, which is stored in
@@ -31,6 +48,11 @@ def fieldDict(instr, a, n):
         NBC_FLDS['lk']: n,
         NBC_FLDS['an']: a
         }
+
+def makeFileReadOnly(fpath):
+    os.chmod(fpath, S_IREAD|S_IRGRP|S_IROTH)
+
+
 class NotebookEdit(Dialog):
     def __init__(self):
         super(NotebookEdit, self).__init__()
@@ -44,14 +66,14 @@ class NotebookEdit(Dialog):
         self.did = self.deckChooser.selectedId()
 
         # showInfo(str(self.model['flds']))
-
+        self.media_path = mw.col.media.dir() 
 
     def getFilename(self):
         # w = QWidget() 
         # filename = QFileDialog.getOpenFileName(w, 'Open File') 
         # w.show()
         # self.filename = filename
-
+    
         self.filename = '/Users/patricio/code/notebook_cloze/data/multi_cloze.ipynb'
         self.processNotebook()
 
@@ -60,10 +82,17 @@ class NotebookEdit(Dialog):
         # return link to file
 
         # will need to store the notebook file in ankis media folder
-        
+        # save returned path  
+        fname = 'nbc_notebook_%s.ipynb' % randomString(10)
 
-        nb_link = 'http://google.com'
-        return nb_link
+        nb_col_path = os.path.join(self.media_path, fname)
+        with open(nb_col_path, 'w') as outfile:
+            json.dump(nb, outfile)
+            # tmpPath = tmpPath.decode('utf-8')       
+            makeFileReadOnly(nb_col_path) 
+            # nb_path = mw.col.media.writeData(tmpPath, nb)
+            nb_url = nbfile2url(fname)
+            return nb_url
 
     def processNotebook(self):
        output = readNotebook(self.filename) 
