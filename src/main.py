@@ -21,23 +21,11 @@ import unicodedata
 from stat import S_IREAD, S_IRGRP, S_IROTH
 
 randomString = lambda n: ''.join([random.choice(string.ascii_lowercase) for _ in range(n)])
-temporary_notebook_dir = '/tmp/anki_notebooks/'
-if not os.path.exists(temporary_notebook_dir):
-    os.makedirs(temporary_notebook_dir)
-
-
 
 def nbfile2url(nbpath):
     showInfo(nbpath)
     return 'http://alfred.local:8889/notebooks/anki/' + nbpath
 
-def testFunction():
-    # get the number of cards in the current collection, which is stored in
-    # the main window
-    cardCount = mw.col.cardCount()
-    # show a message box
-    showInfo("yo what up")
-    # showInfo("testing 123 " % cardCount)
 
 def launchEditor():
     NotebookEdit()
