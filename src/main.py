@@ -25,6 +25,12 @@ def testFunction():
 def launchEditor():
     NotebookEdit()
 
+def fieldDict(instr, a, n):
+    return {
+        NBC_FLDS['is']: instr,
+        NBC_FLDS['lk']: n,
+        NBC_FLDS['an']: a
+        }
 class NotebookEdit(Dialog):
     def __init__(self):
         super(NotebookEdit, self).__init__()
@@ -49,6 +55,16 @@ class NotebookEdit(Dialog):
         self.filename = '/Users/patricio/code/notebook_cloze/data/multi_cloze.ipynb'
         self.processNotebook()
 
+    def createNotebookLink(self, nb):
+        # write read only notebook file
+        # return link to file
+
+        # will need to store the notebook file in ankis media folder
+        
+
+        nb_link = 'http://google.com'
+        return nb_link
+
     def processNotebook(self):
        output = readNotebook(self.filename) 
        answers,nbs = zip(*output)
@@ -56,19 +72,16 @@ class NotebookEdit(Dialog):
        self.processed = { 'answers': answers, 'nbs':nbs, 'output':output } 
 
        answers = ['\n'.join(t) for t in answers ] 
-       # cloze_txt = '\n'.join(output[0][0]) 
+       nbs = [ self.createNotebookLink(nb) for nb in nbs ]
+
        self.answerList.addItems(answers)
-       
-       ans = answers[0]
+
        instr = self.instructionText.toPlainText()
-       nb_link = 'http://google.com'
+      
        # construct fields dict
-       fields = {
-                NBC_FLDS['is']: instr,
-                NBC_FLDS['lk']: nb_link,
-                NBC_FLDS['an']: ans
-                }
-       self.newCardFields = fields
+       multi_fields = [ fieldDict(instr, a, n) for a,n in zip(answers,nbs) ]
+
+       self.newCards = multi_fields 
     
     def addNote(self, fields):
         flds = self.model['flds']
@@ -90,9 +103,10 @@ class NotebookEdit(Dialog):
         
 
     def accept(self):
-        instructions = self.instructionText.toPlainText()
-        self.addNote(self.newCardFields)
-        showInfo('Added 1 card')
+        numCards = len(self.newCards)
+        for flds in self.newCards:
+            self.addNote(flds)
+        showInfo('Added %s cards' % str(numCards) )
         self.close()
 
 class NotebookCloze(object):
