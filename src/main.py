@@ -61,7 +61,6 @@ class NotebookEdit(Dialog):
         self.filename = QFileDialog.getOpenFileName(w, 'Open File') 
         w.show()
     
-        # self.filename = '/Users/patricio/code/notebook_cloze/data/multi_cloze.ipynb'
         self.processNotebook()
 
     def createNotebookLink(self, nb):
