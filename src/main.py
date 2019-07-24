@@ -23,7 +23,6 @@ from stat import S_IREAD, S_IRGRP, S_IROTH
 randomString = lambda n: ''.join([random.choice(string.ascii_lowercase) for _ in range(n)])
 
 def nbfile2url(nbpath):
-    showInfo(nbpath)
     return 'http://alfred.local:8889/notebooks/anki/' + nbpath
 
 
@@ -54,15 +53,15 @@ class NotebookEdit(Dialog):
         self.did = self.deckChooser.selectedId()
 
         # showInfo(str(self.model['flds']))
-        self.media_path = mw.col.media.dir() 
+        self.media_path = mw.col.media.dir()
+
 
     def getFilename(self):
-        # w = QWidget() 
-        # filename = QFileDialog.getOpenFileName(w, 'Open File') 
-        # w.show()
-        # self.filename = filename
+        w = QWidget() 
+        self.filename = QFileDialog.getOpenFileName(w, 'Open File') 
+        w.show()
     
-        self.filename = '/Users/patricio/code/notebook_cloze/data/multi_cloze.ipynb'
+        # self.filename = '/Users/patricio/code/notebook_cloze/data/multi_cloze.ipynb'
         self.processNotebook()
 
     def createNotebookLink(self, nb):
@@ -83,34 +82,40 @@ class NotebookEdit(Dialog):
             return nb_url
 
     def processNotebook(self):
-       output = readNotebook(self.filename) 
-       answers,nbs = zip(*output)
-       
-       self.processed = { 'answers': answers, 'nbs':nbs, 'output':output } 
-
-       answers = ['\n'.join(t) for t in answers ] 
-       nbs = [ self.createNotebookLink(nb) for nb in nbs ]
-
-       self.answerList.addItems(answers)
-
-       instr = self.instructionText.toPlainText()
-      
-       # construct fields dict
-       multi_fields = [ fieldDict(instr, a, n) for a,n in zip(answers,nbs) ]
-
-       self.newCards = multi_fields 
+        output = readNotebook(self.filename)
+        self.raw_input_nb = output
+        self.displayCurrCloze()
     
+    def displayCurrCloze(self):
+        answers, _ = zip(*self.raw_input_nb)
+        answers = ['\n'.join(t) for t in answers]
+        self.answerList.addItems(answers)
+
+    def createNotebooks(self):
+        answers, nbs = zip(*self.raw_input_nb)
+        answers = ['\n'.join(t) for t in answers]
+        nbs = [self.createNotebookLink(nb) for nb in nbs]
+
+        self.processed_nb = {'answers': answers, 'nbs':nbs}
+
+        instr = self.instructionText.toPlainText()
+        self.newCards = [fieldDict(instr, a, n) for a, n in zip(answers, nbs)]
+
+
+    def createCardFields(self):
+        # assumes notebook has already been processed
+        proc = self.processed_nb
+        instr = self.instructionText.toPlainText()
+        multi_fields = [fieldDict(instr, a, n) for a, n in zip(proc['answers'], proc['nbs'])]
+        self.newCards = multi_fields 
+
     def addNote(self, fields):
         flds = self.model['flds']
-        # need deck id
         self.model['did'] = self.did
-
         # add tags to note
-
         note = Note(mw.col, self.model)
 
         # add data for all fields 
-
         for i in flds:
             fname = i["name"]
             if fname in fields:
@@ -120,6 +125,9 @@ class NotebookEdit(Dialog):
         
 
     def accept(self):
+        # create card fields
+        self.createNotebooks()
+        self.createCardFields()
         numCards = len(self.newCards)
         for flds in self.newCards:
             self.addNote(flds)
